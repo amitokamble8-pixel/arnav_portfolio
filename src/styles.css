@@ -1,5 +1,5 @@
 /* ==================================================================
-   styles.css — Nikhil Maalige portfolio
+   styles.css — Arnav Bang portfolio
    ------------------------------------------------------------------
    1.  Tokens & reset
    2.  Layout primitives
@@ -22,7 +22,8 @@
    18. Responsive
    ================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+/* Playfair weight 800 added — the hero name uses 800, which was being faked by the browser */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 
 /* ==================================================================
@@ -67,12 +68,17 @@
 
 *{box-sizing:border-box;margin:0;padding:0}
 
-html{scroll-behavior:smooth}
+html{
+  scroll-behavior:smooth;
+  -webkit-text-size-adjust:100%;   /* stop iOS inflating text in landscape */
+  text-size-adjust:100%;
+}
 
 body{
   color:var(--text);
   font-family:var(--font-sans);
   -webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent;
   overflow-x:hidden;
 
   background-color:var(--bg);
@@ -86,6 +92,7 @@ body{
 
 a{color:inherit;text-decoration:none}
 button{font-family:inherit}
+img{max-width:100%}
 :focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:6px}
 
 @keyframes rise{
@@ -98,7 +105,7 @@ button{font-family:inherit}
    2. LAYOUT PRIMITIVES
    ================================================================== */
 
-.app{display:flex;flex-direction:column;min-height:100vh}
+.app{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
 main{flex:1}
 
 .section{max-width:1200px;margin:0 auto;padding:72px 40px}
@@ -185,16 +192,26 @@ main{flex:1}
   background:var(--surface);border:1px solid var(--line);
   box-shadow:var(--shadow-card);
 }
-.burger span{width:18px;height:2px;background:var(--ink);border-radius:2px}
+.burger span{
+  width:18px;height:2px;background:var(--ink);border-radius:2px;
+  transition:transform .2s ease, opacity .2s ease;
+}
+/* burger turns into an X while the menu is open */
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
 
 .mobile-menu{
   position:absolute;top:calc(100% - 4px);left:20px;right:20px;
   display:flex;flex-direction:column;padding:10px 22px 16px;
   background:var(--surface);border:1px solid var(--line);border-radius:18px;
   box-shadow:var(--shadow-pill);
+  max-height:calc(100vh - 96px);max-height:calc(100dvh - 96px);
+  overflow-y:auto;overscroll-behavior:contain;
+  animation:rise .18s ease both;
 }
 .mobile-menu a{
-  padding:13px 0;font-family:var(--font-display);font-size:16.5px;color:var(--muted);
+  padding:14px 0;font-family:var(--font-display);font-size:17px;color:var(--muted);
   border-bottom:1px solid var(--line-soft);
 }
 .mobile-menu a:last-child{border-bottom:0}
@@ -215,11 +232,11 @@ main{flex:1}
   animation:rise .7s cubic-bezier(.2,.7,.2,1) both;
 }
 
-/* huge, tight, uppercase — surname in indigo */
+/* huge, tight, uppercase — scales with the screen instead of a fixed 115px */
 .hero-name{
   display:block;margin-top:16px;
   font-family:var(--font-display);font-weight:800;text-transform:uppercase;
-  font-size:115px;line-height:.98;letter-spacing:-.045em;
+  font-size:clamp(56px,12vw,115px);line-height:.98;letter-spacing:-.045em;
   color:var(--ink);
   animation:rise .7s .06s cubic-bezier(.2,.7,.2,1) both;
 }
@@ -631,18 +648,21 @@ a.award-row:hover{background:rgba(255,255,255,.65)}
 .connect p{max-width:58ch;margin:22px auto 0;color:var(--muted);font-size:17px;line-height:1.7}
 .connect .cta-row{justify-content:center}
 
-.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
+/* min() stops the 280px column overflowing on small phones */
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:22px}
 .contact-card{
   display:flex;align-items:center;gap:20px;padding:30px;border-radius:16px;
   background:var(--surface);border:1px solid var(--line);color:var(--blue);
   box-shadow:var(--shadow-card);
   transition:transform .2s, box-shadow .2s;
 }
+.contact-card > div{min-width:0}
+.contact-card svg{flex-shrink:0}
 .contact-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-card-hover)}
 .contact-card h4{
   font-family:var(--font-display);font-weight:500;font-size:19px;color:var(--ink);
 }
-.contact-card p{margin-top:7px;font-family:var(--font-mono);font-size:13px;color:var(--muted)}
+.contact-card p{margin-top:7px;font-family:var(--font-mono);font-size:13px;color:var(--muted);overflow-wrap:anywhere}
 
 
 /* ==================================================================
@@ -677,10 +697,6 @@ a.award-row:hover{background:rgba(255,255,255,.65)}
   font-size:40px;line-height:.98;letter-spacing:-.045em;
   color:var(--ink);
   animation:rise .7s .06s cubic-bezier(.2,.7,.2,1) both;}
-  
-.hero-name .ln-1{font-weight:800;color:var(--ink)}
-.hero-name .ln-2{font-weight:800;color:var(--gold);margin-left:.14em}
-
 
 .footer-tag{margin-top:18px;max-width:34ch;color:var(--muted);font-size:15.5px;line-height:1.6}
 .footer-loc{margin-top:16px;font-family:var(--font-mono);font-size:13.5px;color:var(--dim)}
@@ -774,9 +790,13 @@ a.award-row:hover{background:rgba(255,255,255,.65)}
    18. RESPONSIVE
    ================================================================== */
 
+/* ---------- tablet & below: burger menu ---------- */
 @media (max-width:1080px){
   .pill{display:none}
-  .burger{display:flex}
+  /* burger sits in normal flow so the header has a real height
+     (it was absolutely positioned and spilling out of a 36px-tall header) */
+  .nav-wrap{justify-content:flex-end}
+  .burger{display:flex;position:static}
   .grid-3{grid-template-columns:1fr 1fr}
   .footer-grid{grid-template-columns:1fr 1fr;gap:40px}
 }
@@ -789,28 +809,134 @@ a.award-row:hover{background:rgba(255,255,255,.65)}
   .skill-col:first-child{border-top:0}
 }
 
+/* ---------- phones ---------- */
 @media (max-width:680px){
-  .section{padding:56px 22px}
-  .hero{padding:64px 0 56px}
-  .hero-inner{padding:0 22px}
-  .hero-bio{text-align:left}
-  .prose p{text-align:left}
-  .nav-wrap{padding:16px 20px}
-  .burger{right:20px}
+  /* fixed backgrounds are janky / ignored on mobile browsers */
+  body{background-attachment:scroll, scroll}
+
+  /* layout */
+  .section{padding:48px 20px}
   .grid-3,.grid-2,.footer-grid{grid-template-columns:1fr}
-  .score-grid{grid-template-columns:1fr}
-  .vol-stats{gap:36px}
-  .vol-panel,.connect{padding:40px 24px}
-  .card,.edu-card,.score-card{padding:26px 24px}
-  .detail-panel{padding:28px 24px}
-  .award-row{gap:16px;padding:24px 0}
-  .article-row{flex-direction:column;gap:16px;padding:24px 0}
+  .grid-2,.grid-3{gap:18px}
+  .stack{gap:16px}
+
+  /* nav */
+  .nav-wrap{padding:12px 16px}
+  .mobile-menu{left:16px;right:16px}
+
+  /* hero — the name was a fixed 115px and overflowed the screen */
+  .hero{padding:28px 0 32px}
+  .hero-inner{padding:0 20px}
+  .hero-eyebrow{font-size:11.5px;letter-spacing:.14em}
+  .hero-name{margin-top:12px;font-size:clamp(48px,20vw,96px);letter-spacing:-.04em}
+  .hero-name .ln-2{display:block;margin-left:0}   /* surname drops to its own line */
+  .hero-tag{margin-top:18px;font-size:17px;line-height:1.45}
+  .hero-bio{margin-top:20px;font-size:16px;line-height:1.65;text-align:left}
+  .hero .cta-row{margin-top:26px;padding-top:24px;gap:10px}
+
+  /* buttons */
+  .cta-row{gap:10px;margin-top:32px}
   .cta-row .btn{flex:1 1 auto;justify-content:center}
+  .btn{padding:14px 24px}
+
+  /* headings */
+  .sec-head,.sub-head{gap:8px 16px}
+  .sec-eyebrow{font-size:11px;letter-spacing:.14em;line-height:1.6}
+  .sec-rule{margin:18px 0 28px}
+  .sub-head{margin-top:52px}
+  .sub-head h2{font-size:24px}
+  .page-head p{font-size:16px}
+  .more-link{margin-top:24px}
+
+  /* cards */
+  .card,.edu-card,.score-card{padding:24px 20px}
+  .card h3,.edu-top h3,.score-head h3{font-size:19.5px}
+  .card-desc{font-size:15.5px;line-height:1.65}
+  .edu-loc{font-size:17px}
+  .score-grid{grid-template-columns:1fr}
+
+  /* awards & interests — these are bordered cards, so they need side padding
+     (previously padding:24px 0 pushed text straight against the border) */
+  .award-row{gap:14px;padding:20px 18px;margin-bottom:14px}
+  .award-ico{font-size:20px}
+  .award-title{font-size:18.5px;gap:6px 12px}
+  .award-desc{font-size:15px;line-height:1.65;text-align:left}
+  .article-row{flex-direction:column;gap:12px;padding:20px 18px;margin-bottom:14px}
+  .article-row h3{font-size:18.5px}
+  .article-outlet{font-size:15px}
+
+  /* skills */
+  .skill-col{padding:24px 20px}
+  .skill-items{gap:12px;margin-top:16px}
+  .skill-items li{font-size:15.5px}
+
+  /* detail pages */
+  .back-link{margin-bottom:28px}
+  .detail-head{margin-bottom:28px}
+  .detail-org{font-size:17px}
+  .detail-panel{padding:26px 20px}
+  .detail-panel h2:not(:first-child){margin-top:32px}
+  .detail-panel p{font-size:15.5px;line-height:1.7}
+
+  /* activities */
+  .sport-card{padding:24px 20px}
+
+  /* about */
+  .prose p{font-size:16px;line-height:1.7;margin-bottom:18px;text-align:left}
+  .about-photo{max-width:none}
+
+  /* volunteering & connect */
+  .vol-panel,.connect{padding:36px 20px}
+  .vol-stats{gap:28px 36px}
+  .vol-stats strong{font-size:38px}
+  .vol-orgs{margin-top:32px;gap:10px}
+  .vol-chip{padding:10px 16px;font-size:12px}
+  .connect p{font-size:16px}
+
+  /* contact */
+  .contact-grid{gap:14px}
+  .contact-card{padding:22px 20px;gap:16px}
+
+  /* 404 */
+  .notfound{padding-top:80px;padding-bottom:90px}
+  .notfound h1{font-size:80px}
+
+  /* footer */
+  .footer{margin-top:32px;padding:48px 20px 28px}
+  .footer-grid{gap:32px}
+  .footer-brand{font-size:34px}
+  .footer h5{margin-bottom:16px}
+  .footer-grid a:not(.footer-brand){margin-bottom:12px;font-size:15.5px}
+  .footer-bottom{margin-top:36px;padding-top:22px;font-size:13px}
+
+  /* gallery & lightbox — arrows move below the photo so it gets the full width */
   .gallery{gap:14px}
   .gallery-item{flex-basis:78%}
   .gallery.compact .gallery-item{flex-basis:120px}
   .lightbox{padding:16px;gap:8px}
-  .lightbox-nav{width:40px;height:40px;font-size:26px}
+  .lightbox figure{max-width:100%}
+  .lightbox figure img{max-height:70vh}
+  .lightbox-nav{position:absolute;bottom:24px;width:44px;height:44px;font-size:26px}
+  .lightbox-nav.prev{left:calc(50% - 56px)}
+  .lightbox-nav.next{right:calc(50% - 56px)}
+  .lightbox-close{top:14px;right:14px}
+}
+
+/* ---------- very small phones (iPhone SE, older Androids) ---------- */
+@media (max-width:380px){
+  .section{padding:40px 16px}
+  .hero-inner{padding:0 16px}
+  .nav-wrap{padding:10px 12px}
+  .card,.edu-card,.score-card,.detail-panel,.sport-card{padding:22px 16px}
+  .award-row,.article-row{padding:18px 16px}
+  .btn{padding:13px 20px;font-size:14.5px}
+}
+
+/* ---------- touch screens: no "stuck" hover lift after tapping ---------- */
+@media (hover:none){
+  .card:hover,.edu-card:hover,.sport-card:hover,.contact-card:hover,
+  .btn-primary:hover,.btn-ghost:hover,.gallery-btn:hover img{transform:none}
+  .btn-primary:hover{background-color:var(--ink)}
 }
 
 @media (prefers-reduced-motion:reduce){
